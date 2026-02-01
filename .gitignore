@@ -1,0 +1,35 @@
+# Feast .gitignore
+
+# User data (lives in workspace, not skill)
+# These patterns are for if someone accidentally puts user data in the skill folder
+# Templates are fine to commit
+/meals/
+**/meals/profile.yaml
+**/meals/history.yaml
+**/meals/favourites.yaml
+**/meals/failures.yaml
+**/meals/weeks/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.env
+venv/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
