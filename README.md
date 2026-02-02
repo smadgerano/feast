@@ -29,6 +29,10 @@ clawhub install feast
 git clone https://github.com/smadgerano/feast.git ~/.openclaw/skills/feast
 ```
 
+## Setup
+
+Ask your agent to runthrough the Feast onboarding process.
+
 ## Documentation
 
 - [Specification](docs/SPECIFICATION.md) — Full system design
