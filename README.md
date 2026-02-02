@@ -31,7 +31,9 @@ git clone https://github.com/smadgerano/feast.git ~/.openclaw/skills/feast
 
 ## Setup
 
-Ask your agent to run through the Feast onboarding process. This will guide you through making all the dietry and regional decisions needed.
+Ask your agent to run through the Feast onboarding process.
+
+This will guide you through making all the dietary and regional decisions needed, and then start planning your culinary experiences.
 
 
 ## Documentation
