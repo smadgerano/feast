@@ -50,7 +50,24 @@ user:
 # Notification schedule and preferences
 schedule:
   notifications:
-    channel: "auto"                 # auto, telegram, discord, webchat, signal, etc.
+    # Primary notification channel
+    # Options: auto, telegram, discord, signal, webchat
+    # "auto" = deliver to current session or first available channel
+    channel: "auto"
+    
+    # Push notifications (optional, requires external skill)
+    # Enable this for notifications to mobile devices independent of chat channels
+    push:
+      enabled: false
+      method: null                  # "pushbullet", "ntfy", or null
+      # Method-specific config:
+      # - pushbullet: requires pushbullet-notify skill installed with API key configured
+      # - ntfy: configure topic below
+      ntfy:
+        topic: null                 # Your ntfy.sh topic name
+        server: "https://ntfy.sh"   # Default server, or self-hosted URL
+    
+    # Quiet hours (notifications will be held until after quiet hours end)
     quietHoursStart: "22:00"        # Don't notify after this time
     quietHoursEnd: "08:00"          # Don't notify before this time
   

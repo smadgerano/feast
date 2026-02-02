@@ -493,6 +493,90 @@ Note: US tbsp = 14.8ml, UK tbsp = 15ml, AU tbsp = 20ml
 
 ---
 
+## Notification System
+
+Feast uses OpenClaw's cron system to send reminders at key moments in the weekly cadence.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Cron Job Fires                          │
+│                           │                                 │
+│                           ▼                                 │
+│              ┌─────────────────────────┐                    │
+│              │   agentTurn payload     │                    │
+│              │   (isolated session)    │                    │
+│              └───────────┬─────────────┘                    │
+│                          │                                  │
+│                          ▼                                  │
+│              ┌─────────────────────────┐                    │
+│              │  Read profile.yaml      │                    │
+│              │  → notifications config │                    │
+│              └───────────┬─────────────┘                    │
+│                          │                                  │
+│            ┌─────────────┼─────────────┐                    │
+│            ▼             ▼             ▼                    │
+│     ┌──────────┐  ┌──────────┐  ┌──────────┐               │
+│     │ Channel  │  │ Channel  │  │  Push    │               │
+│     │(telegram)│  │(webchat) │  │(optional)│               │
+│     └──────────┘  └──────────┘  └──────────┘               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Why agentTurn, Not systemEvent
+
+Cron jobs use `agentTurn` payloads instead of `systemEvent` because:
+
+1. **systemEvent** only injects text into the chat session — users won't see it unless actively watching
+2. **agentTurn** spawns an isolated agent that can use tools to deliver notifications via the user's preferred channel
+
+### Supported Channels
+
+| Channel | Method | Requirement |
+|---------|--------|-------------|
+| `auto` | Detect from session context | None |
+| `telegram` | OpenClaw message tool | Telegram configured |
+| `discord` | OpenClaw message tool | Discord configured |
+| `signal` | OpenClaw message tool | Signal configured |
+| `webchat` | Session output | None |
+
+### Push Notifications (Optional)
+
+For mobile push independent of chat:
+
+| Method | Implementation | Requirement |
+|--------|---------------|-------------|
+| Pushbullet | External skill | pushbullet-notify skill installed |
+| ntfy | HTTP POST to ntfy.sh | Topic configured in profile |
+
+Push notifications supplement the primary channel; they don't replace it.
+
+### Timing Behaviour
+
+Cron jobs use `wakeMode: "next-heartbeat"`, meaning:
+- Jobs execute on the next heartbeat after their scheduled time
+- With default 1-hour heartbeat, notifications may arrive up to 1 hour late
+- Acceptable for meal planning; not suitable for time-critical alerts
+
+### Profile Schema (notifications section)
+
+```yaml
+schedule:
+  notifications:
+    channel: string           # auto, telegram, discord, signal, webchat
+    push:
+      enabled: boolean
+      method: string|null     # pushbullet, ntfy, or null
+      ntfy:
+        topic: string|null
+        server: string        # default: https://ntfy.sh
+    quietHoursStart: string   # HH:MM format
+    quietHoursEnd: string     # HH:MM format
+```
+
+---
+
 ## Technical Requirements
 
 - **Importable** — Works when installed on any OpenClaw instance

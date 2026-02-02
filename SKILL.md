@@ -52,6 +52,55 @@ Default schedule (user-configurable):
 | Week | Daily reveals | "What's for dinner?" |
 | End of week | Review | "Review this week's meals" |
 
+## Notifications
+
+Feast sends reminders at key moments: planning day, confirmation, shopping list, daily reveals, and week review. These are delivered via cron jobs that spawn isolated agents to send notifications.
+
+### Notification Channels
+
+Users configure their preferred channel in `profile.yaml` under `schedule.notifications.channel`:
+
+| Channel | Delivery Method |
+|---------|-----------------|
+| `auto` | Delivers to the current session or first available channel |
+| `telegram` | Sends via Telegram (requires Telegram channel configured in OpenClaw) |
+| `discord` | Sends via Discord (requires Discord channel configured in OpenClaw) |
+| `signal` | Sends via Signal (requires Signal channel configured in OpenClaw) |
+| `webchat` | Outputs to the chat session |
+
+### Push Notifications (Optional)
+
+For notifications to mobile devices independent of chat channels, users can enable push notifications:
+
+```yaml
+schedule:
+  notifications:
+    push:
+      enabled: true
+      method: "pushbullet"    # or "ntfy"
+```
+
+**Supported methods:**
+
+- **Pushbullet** — Requires the `pushbullet-notify` skill installed separately with API key configured
+- **ntfy** — Uses ntfy.sh (or self-hosted); configure topic in profile
+
+Push notifications are sent *in addition to* the primary channel, not instead of it. If push delivery fails, the notification still goes to the primary channel.
+
+### Timing
+
+Notifications are delivered via OpenClaw's cron system with `wakeMode: "next-heartbeat"`. This means notifications arrive within the heartbeat interval (typically up to 1 hour) after the scheduled time. For most meal planning purposes, this slight delay is acceptable.
+
+### Managing Notifications
+
+Users can adjust their notification preferences anytime:
+
+- "Change my Feast notifications to Telegram"
+- "Turn off morning hints"
+- "Enable Pushbullet notifications"
+
+When updating, remove old cron jobs using stored IDs and create new ones with updated settings.
+
 ## Workflows
 
 ### Onboarding

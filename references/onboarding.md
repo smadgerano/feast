@@ -117,7 +117,9 @@ Store in profile under `schedule.notifications` and `schedule.reminders`.
 
 ### 10. Set Up Cron Jobs
 
-After saving the profile, create the recurring reminders:
+After saving the profile, create the recurring reminders using the cron tool.
+
+#### Schedule Calculation
 
 ```python
 # Calculate actual days based on weekStart
@@ -136,37 +138,85 @@ After saving the profile, create the recurring reminders:
 # Review: "0 20 * * 6" (Saturday 20:00 if week ends Sat)
 ```
 
-Use the cron tool to create jobs:
+#### Cron Job Configuration
+
+**Important:** Use `agentTurn` payloads, not `systemEvent`. This ensures notifications are actually delivered to the user via their preferred channel.
+
+Each cron job should be configured as:
+
+```yaml
+sessionTarget: "isolated"
+payload:
+  kind: "agentTurn"
+  message: |
+    Send a Feast notification.
+    
+    **Title:** 🍽️ Feast
+    **Body:** [specific message for this reminder]
+    
+    **Delivery Instructions:**
+    1. Read the user's profile at workspace/meals/profile.yaml
+    2. Check schedule.notifications.channel for their preference
+    3. Deliver the notification:
+    
+       **If channel is "telegram", "discord", or "signal":**
+       Use the message tool with action=send and channel=[channel]
+       
+       **If channel is "webchat" or "auto":**
+       Simply output the notification text — it will be delivered to the session
+       
+       **If push notifications are enabled** (schedule.notifications.push.enabled = true):
+       Check schedule.notifications.push.method and send accordingly:
+       
+       • "pushbullet": Run the pushbullet-notify skill script if available:
+         python3 [workspace]/skills/pushbullet-notify/scripts/send_notification.py -t "[title]" -b "[body]"
+       
+       • "ntfy": POST to ntfy.sh topic (if configured in profile)
+       
+       If push method is configured but fails, fall back to the channel setting.
+    
+    4. Confirm the notification was sent.
+```
+
+#### Reminder Messages
+
+Create jobs with these specific messages:
 
 1. **Planning reminder**
-   ```
-   schedule: { kind: "cron", expr: "<cron>", tz: "<user timezone>" }
-   payload: { kind: "systemEvent", text: "🍽️ Feast: Time to plan next week's meals! Say 'let's plan meals' when you're ready." }
+   ```yaml
+   name: "Feast: Planning"
+   schedule: { kind: "cron", expr: "0 18 * * 4", tz: "<user timezone>" }
+   # Body: "Time to plan next week's meals! Say 'let's plan meals' when you're ready."
    ```
 
 2. **Confirmation reminder**
-   ```
-   payload: { kind: "systemEvent", text: "🍽️ Feast: Your meal plan is ready for review. Say 'confirm meal plan' to see it." }
+   ```yaml
+   name: "Feast: Confirmation"
+   # Body: "Your meal plan is ready for review. Say 'confirm meal plan' to see it and make any changes."
    ```
 
 3. **Shopping list reminder**
-   ```
-   payload: { kind: "systemEvent", text: "🍽️ Feast: Shopping list is ready! Say 'show shopping list' to review." }
-   ```
-
-4. **Daily reveal** (one per cooking day)
-   ```
-   payload: { kind: "systemEvent", text: "🍽️ Feast: Ready for today's reveal? Say 'what's for dinner?' to find out!" }
+   ```yaml
+   name: "Feast: Shopping List"
+   # Body: "Shopping list is ready! Say 'show shopping list' to review and plan your shop."
    ```
 
-5. **Daily hint** (if enabled, morning of cooking days)
+4. **Daily reveal** (create one for each cooking day)
+   ```yaml
+   name: "Feast: Daily Reveal"
+   # Body: "Ready for today's reveal? Say 'what's for dinner?' to find out what's cooking!"
    ```
-   payload: { kind: "systemEvent", text: "🍽️ Feast: Today's meal hint: <hint from plan>. Full reveal this afternoon!" }
+
+5. **Morning hint** (if enabled, morning of cooking days)
+   ```yaml
+   name: "Feast: Morning Hint"
+   # Body: "Good morning! Today's cooking adventure awaits... check in this afternoon for the full reveal!"
    ```
 
 6. **Week review**
-   ```
-   payload: { kind: "systemEvent", text: "🍽️ Feast: How was this week's cooking? Say 'review meals' to rate and reflect." }
+   ```yaml
+   name: "Feast: Week Review"
+   # Body: "How was this week's cooking? Say 'review meals' to rate your dishes and capture what worked!"
    ```
 
 **Store the cron job IDs** in `profile.schedule.cronJobs` so they can be updated or removed later.
