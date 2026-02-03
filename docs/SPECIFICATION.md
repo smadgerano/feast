@@ -1,9 +1,5 @@
 # Feast — Specification
 
-**Version:** 1.0.1  
-**Status:** Released  
-**Created:** 2026-02-01  
-
 ---
 
 ## Overview
