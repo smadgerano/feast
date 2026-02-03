@@ -228,41 +228,35 @@ be dynamic (e.g., morning hints, daily reveals).
      [delivery instructions]
    ```
 
-4. **Daily reveal** ⚡ DYNAMIC — reads the week plan and delivers the full reveal
+4. **Daily reveal** ⚡ DYNAMIC — reads the week plan to announce today's dish
    ```yaml
    name: "Feast: Daily Reveal"
    message: |
-     You are delivering today's Feast reveal — the main event.
+     You are sending today's Feast reveal notification — a short, exciting
+     announcement of what's cooking tonight.
 
      **Steps:**
      1. Read the user profile at workspace/meals/profile.yaml
      2. Find the most recent week plan file in workspace/meals/weeks/
-     3. Read the full week plan file
-     4. Find TODAY's date entry in the plan
-     5. If today is not a cooking day (cheat/skip), send a brief note and stop
-     6. Mark the day as revealed (set revealed: true in the week file)
-     7. Deliver the FULL reveal via the user's preferred notification channel:
+     3. Read the week plan and find TODAY's date entry
+     4. If today is not a cooking day (cheat/skip), send a brief note and stop
+     5. Send a notification that names the dish and its region of origin
 
-        **The reveal should include:**
-        - 🌍 THE PLACE: Region name, the evocative description, what's happening
-          there now (from currentContext)
-        - 🍜 THE DISH: Name, origin story, cultural significance, how it's eaten
-          locally. Full recipe — ingredients and method in the user's preferred
-          units (check profile for celsius/metric/etc)
-        - 🎵 THE SOUNDTRACK: The music philosophy, contemporary + classic tracks,
-          full playlist with links (Spotify/YouTube)
-        - ✨ SETTING THE SCENE: Serving suggestions, drinks pairings, atmosphere
+     **The notification should:**
+     - Name the dish
+     - Name the region/country it's from
+     - Be short and exciting (1-3 sentences)
+     - Make them want to ask for the full reveal
 
-        Format it beautifully — this is the experience, not just data.
-        Use the structure from the week plan template.
+     **Example:**
+     "Tonight it's Salmon Teriyaki — straight from the kitchens of Osaka, Japan 🇯🇵
+      Ask Lyra for the full reveal when you're ready to cook!"
 
      **Rules:**
-     - This IS the reveal — deliver everything, don't tell them to ask elsewhere
-     - If the day is already revealed, send a brief reminder with the dish name
-       and key details instead of the full reveal
+     - Keep it SHORT — dish name, region, a spark of excitement
+     - The full reveal (recipe, music, atmosphere) happens in the main session
+       when the user asks for it
      - If no week plan exists or today has no meal, say so honestly
-     - Keep the notification channel-appropriate (Pushbullet = shorter summary
-       with key details; webchat/Telegram = full formatted reveal)
 
      [delivery instructions]
    ```
