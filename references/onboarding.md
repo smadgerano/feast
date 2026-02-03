@@ -228,12 +228,42 @@ be dynamic (e.g., morning hints, daily reveals).
      [delivery instructions]
    ```
 
-4. **Daily reveal** (static — the actual reveal happens in the main session)
+4. **Daily reveal** ⚡ DYNAMIC — reads the week plan and delivers the full reveal
    ```yaml
    name: "Feast: Daily Reveal"
    message: |
-     Send a Feast notification.
-     Body: "Ready for today's reveal? Ask 'what's for dinner?' to find out what's cooking!"
+     You are delivering today's Feast reveal — the main event.
+
+     **Steps:**
+     1. Read the user profile at workspace/meals/profile.yaml
+     2. Find the most recent week plan file in workspace/meals/weeks/
+     3. Read the full week plan file
+     4. Find TODAY's date entry in the plan
+     5. If today is not a cooking day (cheat/skip), send a brief note and stop
+     6. Mark the day as revealed (set revealed: true in the week file)
+     7. Deliver the FULL reveal via the user's preferred notification channel:
+
+        **The reveal should include:**
+        - 🌍 THE PLACE: Region name, the evocative description, what's happening
+          there now (from currentContext)
+        - 🍜 THE DISH: Name, origin story, cultural significance, how it's eaten
+          locally. Full recipe — ingredients and method in the user's preferred
+          units (check profile for celsius/metric/etc)
+        - 🎵 THE SOUNDTRACK: The music philosophy, contemporary + classic tracks,
+          full playlist with links (Spotify/YouTube)
+        - ✨ SETTING THE SCENE: Serving suggestions, drinks pairings, atmosphere
+
+        Format it beautifully — this is the experience, not just data.
+        Use the structure from the week plan template.
+
+     **Rules:**
+     - This IS the reveal — deliver everything, don't tell them to ask elsewhere
+     - If the day is already revealed, send a brief reminder with the dish name
+       and key details instead of the full reveal
+     - If no week plan exists or today has no meal, say so honestly
+     - Keep the notification channel-appropriate (Pushbullet = shorter summary
+       with key details; webchat/Telegram = full formatted reveal)
+
      [delivery instructions]
    ```
 

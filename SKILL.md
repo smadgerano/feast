@@ -163,8 +163,11 @@ Save to `workspace/meals/profile.yaml`.
 
 ### Daily Reveal
 
+The reveal is delivered proactively via the notification cron job — the user should NOT need to ask for it. The notification IS the reveal.
+
 1. Check it's a cooking day
-2. Reveal:
+2. Mark the day as revealed in the week file
+3. Deliver the full experience:
    - Full recipe (in user's units)
    - **Theme dossier highlights:**
      - The place: Regional context, history, and character
@@ -176,6 +179,7 @@ Save to `workspace/meals/profile.yaml`.
      - Full tracklist with links (Spotify/YouTube)
      - The vibe and journey the playlist creates
    - Setting the scene: Serving suggestions, drinks pairings, atmosphere tips
+4. Adapt format to the notification channel (Pushbullet = concise summary with key details; webchat/Telegram = full formatted reveal)
 3. **Morning hint** (if enabled) — a short, cryptic teaser sent earlier in the day to build anticipation:
    - Read today's entry from the week plan
    - Craft 2-3 sentences that hint at the meal without revealing it
