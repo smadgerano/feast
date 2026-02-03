@@ -176,7 +176,13 @@ Save to `workspace/meals/profile.yaml`.
      - Full tracklist with links (Spotify/YouTube)
      - The vibe and journey the playlist creates
    - Setting the scene: Serving suggestions, drinks pairings, atmosphere tips
-3. Optional morning hint for anticipation
+3. **Morning hint** (if enabled) — a short, cryptic teaser sent earlier in the day to build anticipation:
+   - Read today's entry from the week plan
+   - Craft 2-3 sentences that hint at the meal without revealing it
+   - Draw from the place description, dish story, cultural context, current events, or music
+   - Be playful, mysterious, evocative — not generic
+   - Never name the dish or country directly
+   - The goal is to make the user curious and excited for the afternoon reveal
 
 ### Review (End of Week)
 

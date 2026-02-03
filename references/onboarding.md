@@ -151,72 +151,137 @@ payload:
   message: |
     Send a Feast notification.
     
-    **Title:** 🍽️ Feast
-    **Body:** [specific message for this reminder]
+    [Task-specific instructions — see individual jobs below]
     
     **Delivery Instructions:**
-    1. Read the user's profile at workspace/meals/profile.yaml
-    2. Check schedule.notifications.channel for their preference
-    3. Deliver the notification:
+    1. Read the user profile at workspace/meals/profile.yaml
+    2. Check schedule.notifications for their preference
+    3. Compose the notification title and body text
+    4. Deliver the notification:
     
+       **If channel is "pushbullet":**
+       Use the exec tool to run the pushbullet-notify script. IMPORTANT: To avoid
+       shell quoting issues with apostrophes and special characters, write the body
+       to a temporary file first, then use it:
+       
+       ```python
+       import subprocess, tempfile, os
+       body = "your composed message here"
+       with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+           f.write(body)
+           tmp = f.name
+       # Read body from file to avoid shell escaping issues
+       subprocess.run(['python3', 'skills/pushbullet-notify/scripts/send_notification.py',
+                       '--title', '🍽️ Feast', '--body', body])
+       os.unlink(tmp)
+       ```
+       
+       Or simply pass the arguments directly via exec without shell interpolation —
+       the key is to NEVER embed the body text inside a shell string with quotes.
+       Use the exec tool's command as an array or use Python's subprocess with a list.
+       
        **If channel is "telegram", "discord", or "signal":**
        Use the message tool with action=send and channel=[channel]
        
        **If channel is "webchat" or "auto":**
        Simply output the notification text — it will be delivered to the session
        
-       **If push notifications are enabled** (schedule.notifications.push.enabled = true):
-       Check schedule.notifications.push.method and send accordingly:
+       **If push notifications are also enabled** (schedule.notifications.push):
+       Send via push method in addition to primary channel.
        
-       • "pushbullet": Run the pushbullet-notify skill script if available:
-         python3 [workspace]/skills/pushbullet-notify/scripts/send_notification.py -t "[title]" -b "[body]"
-       
-       • "ntfy": POST to ntfy.sh topic (if configured in profile)
-       
-       If push method is configured but fails, fall back to the channel setting.
+       If the configured method fails, fall back to outputting the text directly.
     
-    4. Confirm the notification was sent.
+    5. Confirm the notification was sent.
 ```
 
 #### Reminder Messages
 
-Create jobs with these specific messages:
+Each job type below includes its full agentTurn prompt. The prompts tell the spawned
+agent what to do — including reading data files when the notification content should
+be dynamic (e.g., morning hints, daily reveals).
 
-1. **Planning reminder**
+1. **Planning reminder** (static message — no data lookup needed)
    ```yaml
    name: "Feast: Planning"
    schedule: { kind: "cron", expr: "0 18 * * 4", tz: "<user timezone>" }
-   # Body: "Time to plan next week's meals! Say 'let's plan meals' when you're ready."
+   message: |
+     Send a Feast notification.
+     Body: "Time to plan next week's meals! Say 'let's plan meals' when you're ready."
+     [delivery instructions]
    ```
 
-2. **Confirmation reminder**
+2. **Confirmation reminder** (static)
    ```yaml
    name: "Feast: Confirmation"
-   # Body: "Your meal plan is ready for review. Say 'confirm meal plan' to see it and make any changes."
+   message: |
+     Send a Feast notification.
+     Body: "Your meal plan is ready for review. Say 'confirm meal plan' to see it and make any changes."
+     [delivery instructions]
    ```
 
-3. **Shopping list reminder**
+3. **Shopping list reminder** (static)
    ```yaml
    name: "Feast: Shopping List"
-   # Body: "Shopping list is ready! Say 'show shopping list' to review and plan your shop."
+   message: |
+     Send a Feast notification.
+     Body: "Shopping list is ready! Say 'show shopping list' to review and plan your shop."
+     [delivery instructions]
    ```
 
-4. **Daily reveal** (create one for each cooking day)
+4. **Daily reveal** (static — the actual reveal happens in the main session)
    ```yaml
    name: "Feast: Daily Reveal"
-   # Body: "Ready for today's reveal? Say 'what's for dinner?' to find out what's cooking!"
+   message: |
+     Send a Feast notification.
+     Body: "Ready for today's reveal? Ask 'what's for dinner?' to find out what's cooking!"
+     [delivery instructions]
    ```
 
-5. **Morning hint** (if enabled, morning of cooking days)
+5. **Morning hint** ⚡ DYNAMIC — reads the week plan to craft a teaser
    ```yaml
    name: "Feast: Morning Hint"
-   # Body: "Good morning! Today's cooking adventure awaits... check in this afternoon for the full reveal!"
+   message: |
+     You are sending a Feast morning hint — a cryptic teaser to build anticipation
+     for today's meal.
+
+     **Steps:**
+     1. Read the user profile at workspace/meals/profile.yaml
+     2. Find the most recent week plan file in workspace/meals/weeks/
+     3. Find TODAY's date entry in the plan
+     4. If today is not a cooking day (cheat/skip), skip — send nothing
+     5. Craft a short, intriguing hint (2-3 sentences max) that:
+        - Alludes to something from the PLACE (region, culture, a vivid detail)
+          without naming the country
+        - OR hints at the DISH in a playful/mysterious way without naming it
+        - OR references something from currentContext, music, or cultural story
+        - Feels personal and evocative, not generic or corporate
+        - Builds genuine curiosity for the afternoon reveal
+     6. Send the hint via the user's preferred notification channel
+
+     **Good examples:**
+     - "Tonight you're heading somewhere they greet each other by asking if
+       they've eaten yet. The smoke rises, the neon glows... 🔥"
+     - "A 17th century technique. A glossy coating. A city that ruined itself
+       through food. Intrigued?"
+     - "The band topping the charts for 1,500 straight days comes from nearby...
+       but tonight's destination has its own rhythm. 🎵"
+
+     **Rules:**
+     - NEVER reveal the dish name or country directly
+     - NEVER use generic filler like "cooking adventure awaits"
+     - Keep it short — this is a teaser, not an essay
+     - If no week plan exists or today has no meal, send nothing
+
+     [delivery instructions]
    ```
 
-6. **Week review**
+6. **Week review** (static)
    ```yaml
    name: "Feast: Week Review"
-   # Body: "How was this week's cooking? Say 'review meals' to rate your dishes and capture what worked!"
+   message: |
+     Send a Feast notification.
+     Body: "How was this week's cooking? Say 'review meals' to rate your dishes and capture what worked!"
+     [delivery instructions]
    ```
 
 **Store the cron job IDs** in `profile.schedule.cronJobs` so they can be updated or removed later.

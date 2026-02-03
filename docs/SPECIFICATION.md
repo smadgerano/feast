@@ -69,7 +69,7 @@ The default cadence (user-configurable):
 
 On each cooking day:
 - Afternoon: Reveal the full experience
-- Optional brief morning hint for mystery/anticipation
+- Optional morning hint: a short, cryptic teaser dynamically generated from the day's plan data (place, dish, music, cultural context) — never generic, never reveals the dish or country directly
 - **The Place:** Regional context, history, what's happening there now
 - **The Dish:** Origin story, cultural significance, how it's eaten locally
 - **The Soundtrack:** Curated playlist with contemporary + classic music from the region
