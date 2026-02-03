@@ -138,7 +138,7 @@ Save to `workspace/meals/profile.yaml`.
 
 ### Confirmation (Friday)
 
-1. Present draft plan with themes
+1. Present draft plan with themes only, not full reveals
 2. Allow amendments
 3. Mark as confirmed
 4. Set up daily reveal reminders
@@ -157,7 +157,7 @@ Save to `workspace/meals/profile.yaml`.
    - Note current deals, multi-buy offers, loyalty card prices
    - Add price recommendations to the shopping list
    - Suggest shopping strategy (single store or split if savings are significant)
-4. Present for review with price guidance
+4. Present for review with price guidance, don't reveal meals
 5. Allow amendments
 6. Mark as approved
 
